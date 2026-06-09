@@ -1,0 +1,56 @@
+# ADMIN
+# ==========================
+@app.route("/admin")
+def admin():
+
+    conn = sqlite3.connect("evento.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, nome, email, telefone, cidade, protocolo, status_pagamento
+        FROM inscritos
+        ORDER BY id DESC
+    """)
+
+    dados = cursor.fetchall()
+    conn.close()
+
+    return render_template_string("""
+    <html>
+    <body style="font-family:Arial;padding:20px;">
+
+    <h1>📊 Admin</h1>
+
+    <table border="1" width="100%" cellpadding="8">
+
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Cidade</th>
+            <th>Status</th>
+            <th>Ingresso</th>
+        </tr>
+
+        {% for p in dados %}
+        <tr>
+            <td>{{ p[1] }}</td>
+            <td>{{ p[2] }}</td>
+            <td>{{ p[3] }}</td>
+            <td>{{ p[4] }}</td>
+            <td>
+            {% if p[6] == "PAGO" %}
+            ✅ PAGO
+            {% else %}
+            <a href="/pagar/{{ p[5] }}">Confirmar Pagamento</a>
+            {% endif %}
+            </td>
+            <td><a href="/ingresso/{{ p[5] }}">Ver</a></td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    </body>
+    </html>
+    """, dados=dados)

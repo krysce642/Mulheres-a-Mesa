@@ -1,0 +1,27 @@
+@app.route("/ingresso/<protocolo>")
+def ingresso(protocolo):
+
+    conn = sqlite3.connect("evento.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nome, status_pagamento
+        FROM inscritos
+        WHERE protocolo = ?
+    """, (protocolo,))
+
+    user = cursor.fetchone()
+    conn.close()
+
+    if not user:
+        return "Ingresso não encontrado"
+
+    nome, status = user
+
+    return render_template(
+        "ingresso.html",
+        nome=nome,
+        status=status,
+        protocolo=protocolo,
+        qr=f"/static/qrcodes/{protocolo}.png"
+    )
