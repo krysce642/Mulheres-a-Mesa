@@ -1,45 +1,25 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
     <title>Mulheres à Mesa</title>
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body style="font-family:Arial;max-width:800px;margin:auto;padding:20px;">
 
-<div style="text-align:center;">
-    <img src="/static/convite.jpg"
-         style="width:100%;max-width:500px;border-radius:15px;">
+<body>
+
+<div class="container">
+
+    <img src="{{ url_for('static', filename='convite.jpeg') }}"
+         class="convite">
+
+    <a href="/inscricao" class="btn-inscricao">
+        Fazer Inscrição
+    </a>
+
 </div>
-
-
-
-<h2>Faça sua inscrição</h2>
-
-<form method="POST">
-
-```
-<input name="nome" placeholder="Nome" required style="width:100%;padding:8px;"><br><br>
-
-<input name="email" placeholder="Email" required style="width:100%;padding:8px;"><br><br>
-
-<input name="telefone" placeholder="Telefone" style="width:100%;padding:8px;"><br><br>
-
-<input name="igreja" placeholder="Igreja" style="width:100%;padding:8px;"><br><br>
-
-<input name="cidade" placeholder="Cidade" style="width:100%;padding:8px;"><br><br>
-
-<textarea name="observacoes"
-          placeholder="Observações"
-          style="width:100%;padding:8px;"></textarea><br><br>
-
-<button type="submit">
-    Inscrever
-</button>
-```
-
-</form>
-
 
 </body>
 </html>
-

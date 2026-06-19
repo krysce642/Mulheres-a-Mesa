@@ -1,7 +1,6 @@
-import sqlite3
-from flask import Flask, request, render_template
-from datetime import datetime
 from flask import Flask, request, render_template, url_for
+from datetime import datetime
+import sqlite3
 import uuid
 import qrcode
 import os
@@ -130,7 +129,13 @@ def index():
    
 
     return render_template("index.html")
-    
+#=========================#
+# INSCRIÇÃO
+# ==========================#
+
+@app.route("/inscricao")
+def inscricao():
+    return render_template("inscricao.html")   
 
 # ==========================
 # INGRESSO
