@@ -10,19 +10,67 @@
 
 <div class="container">
 
-    <div class="card" style="text-align:center">
+    <div class="card"
+         style="
+            text-align:center;
+            width:90%;
+            max-width:500px;
+            margin:auto;
+         ">
 
         <h1>Pagamento PIX</h1>
 
         <h2>R$ {{ valor }}</h2>
 
-        <img src="{{ qr_code }}"
-             style="max-width:250px;">
+<p>
+    <strong>Recebedor:</strong><br>
+    {{ recebedor }}
+</p>
 
+        <img
+            src="{{ qr_code }}"
+            alt="QR Code PIX"
+            style="
+                width:100%;
+                max-width:250px;
+                height:auto;
+                border-radius:10px;
+            "
+        >
         <p><b>Chave PIX:</b></p>
 
-        <p>{{ pix }}</p>
+<textarea
+    id="chavePix"
+    readonly
+    style="
+        width:100%;
+        max-width:400px;
+        height:60px;
+        padding:10px;
+        text-align:center;
+        font-size:16px;
+    ">
+{{ pix }}
+</textarea>
 
+
+
+<button
+    onclick="copiarPix()"
+    style="
+        padding:10px 20px;
+        background:gold;
+        color:black;
+        border:none;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:bold;
+    ">
+    📋 Copiar Chave PIX
+</button>
+
+<p id="mensagemPix" style="color:green;"></p>
+        
         <p><b>Protocolo:</b></p>
 
         <p>{{ protocolo }}</p>
@@ -30,6 +78,28 @@
     </div>
 
 </div>
+<script>
+function copiarPix() {
+
+    const campo = document.getElementById("chavePix");
+
+    campo.select();
+
+    try {
+
+        document.execCommand("copy");
+
+        document.getElementById("mensagemPix").innerHTML =
+            "✅ Chave PIX copiada com sucesso!";
+
+    } catch(err) {
+
+        document.getElementById("mensagemPix").innerHTML =
+            "❌ Não foi possível copiar.";
+
+    }
+}
+</script>
 
 </body>
 </html>

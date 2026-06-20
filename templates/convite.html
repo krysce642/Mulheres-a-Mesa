@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite VIP</title>
+</head>
+<body style="
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#000,#3b2a0a,#d4af37);
+    color:#fff;
+    text-align:center;
+    padding:40px;
+">
+
+    <div style="
+        background:rgba(0,0,0,0.7);
+        padding:30px;
+        border-radius:15px;
+        max-width:450px;
+        margin:auto;
+        box-shadow:0 0 30px gold;
+    ">
+
+        <h1>🎟️ CONVITE VIP</h1>
+
+        <p>Bem-vindo(a): <b>{{ nome }}</b></p>
+
+        <p>ID do ingresso:</p>
+        <h3 style="color:gold">{{ convite_id }}</h3>
+
+<img
+    src="{{ qr }}"
+    style="
+        width:100%;
+        max-width:220px;
+        height:auto;
+        border-radius:10px;
+    "
+>
+<br><br>
+
+<a href="/pdf/{{ convite_id }}"
+   style="
+      display:block;
+      width:100%;
+      max-width:250px;
+      margin:20px auto;
+      padding:14px;
+      background:gold;
+      color:black;
+      text-decoration:none;
+      border-radius:8px;
+      font-weight:bold;
+      text-align:center;
+      box-shadow:0 0 15px gold;
+   ">
+   📄 Baixar PDF
+</a>   
+   <a
+    href="https://wa.me/?text=🎟️%20Meu%20Convite%20VIP%20do%20evento:%20{{ link_convite }}"
+    target="_blank"
+    style="
+        display:inline-block;
+        padding:12px 20px;
+        background:#25D366;
+        color:white;
+        text-decoration:none;
+        border-radius:8px;
+        font-weight:bold;
+        margin-top:15px;
+    ">
+    📲 Compartilhar no WhatsApp
+</a>
+
+<p style="margin-top:20px;color:rgb(129, 21, 151)">
+    ✔ Entrada liberada
+</p>
+    </div>
+
+</body>
+</html>

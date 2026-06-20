@@ -1,18 +1,39 @@
-# ADMIN
-# ==========================
 @app.route("/admin")
 def admin():
+
+    filtro = request.args.get("status", "TODOS")
 
     conn = sqlite3.connect("evento.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT id, nome, email, telefone, cidade, protocolo, status_pagamento
-        FROM inscritos
-        ORDER BY id DESC
-    """)
+    if filtro == "PAGO":
+
+        cursor.execute("""
+            SELECT id, nome, email, telefone, cidade, protocolo, status_pagamento
+            FROM inscritos
+            WHERE status_pagamento='PAGO'
+            ORDER BY id DESC
+        """)
+
+    elif filtro == "PENDENTE":
+
+        cursor.execute("""
+            SELECT id, nome, email, telefone, cidade, protocolo, status_pagamento
+            FROM inscritos
+            WHERE status_pagamento='PENDENTE'
+            ORDER BY id DESC
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT id, nome, email, telefone, cidade, protocolo, status_pagamento
+            FROM inscritos
+            ORDER BY id DESC
+        """)
 
     dados = cursor.fetchall()
+
     conn.close()
 
     return render_template_string("""
@@ -20,6 +41,30 @@ def admin():
     <body style="font-family:Arial;padding:20px;">
 
     <h1>📊 Admin</h1>
+
+    <div style="margin-bottom:20px;">
+
+        <a href="/admin"
+           style="padding:10px 15px;background:#444;color:white;text-decoration:none;border-radius:6px;">
+           Todos
+        </a>
+
+        <a href="/admin?status=PAGO"
+           style="padding:10px 15px;background:green;color:white;text-decoration:none;border-radius:6px;">
+           Pagos
+        </a>
+
+        <a href="/admin?status=PENDENTE"
+           style="padding:10px 15px;background:red;color:white;text-decoration:none;border-radius:6px;">
+           Pendentes
+        </a>
+
+    </div>
+
+    <p>
+        Total encontrado:
+        <strong>{{ dados|length }}</strong>
+    </p>
 
     <table border="1" width="100%" cellpadding="8">
 
@@ -34,18 +79,28 @@ def admin():
 
         {% for p in dados %}
         <tr>
+
             <td>{{ p[1] }}</td>
             <td>{{ p[2] }}</td>
             <td>{{ p[3] }}</td>
             <td>{{ p[4] }}</td>
+
             <td>
             {% if p[6] == "PAGO" %}
-            ✅ PAGO
+                ✅ PAGO
             {% else %}
-            <a href="/pagar/{{ p[5] }}">Confirmar Pagamento</a>
+                <a href="/pagar/{{ p[5] }}">
+                    Confirmar Pagamento
+                </a>
             {% endif %}
             </td>
-            <td><a href="/ingresso/{{ p[5] }}">Ver</a></td>
+
+            <td>
+                <a href="/ingresso/{{ p[5] }}">
+                    🎟️ Ver
+                </a>
+            </td>
+
         </tr>
         {% endfor %}
 

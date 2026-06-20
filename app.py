@@ -1,5 +1,8 @@
 from flask import Flask, request, render_template, url_for
 from datetime import datetime
+from flask import send_file
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 import sqlite3
 import uuid
 import qrcode
@@ -13,7 +16,8 @@ os.makedirs("static/qrcodes", exist_ok=True)
 # CONFIGURAÇÕES
 # ==========================
 CHAVE_PIX = "21990831887"
-VALOR_INSCRICAO = 35.00
+NOME_RECEBEDOR = "TATIANE_S_NASCIMENTO"
+VALOR_INSCRICAO = 35
 
 # ==========================
 # BANCO DE DADOS
@@ -33,15 +37,15 @@ def criar_banco():
             observacoes TEXT,
             protocolo TEXT,
             status_pagamento TEXT,
-            data_inscricao TEXT
+            data_inscricao TEXT,
+            convite_id TEXT
         )
     """)
 
     conn.commit()
     conn.close()
-
 criar_banco()
-
+print("BANCO CRIADO COM SUCESSO")
 # ==========================
 # GERAR QR CODE
 # ==========================
@@ -59,7 +63,19 @@ def gerar_qrcode_pix(chave_pix, valor, nome_arquivo):
     qr.save(arquivo)
 
     return arquivo
+def gerar_qr_convite(convite_id):
 
+    link = f"http://127.0.0.1:8080/convite/{convite_id}"
+
+    qr = qrcode.make(link)
+
+    caminho = os.path.join("static", "qrcodes")
+
+    arquivo = os.path.join(caminho, f"convite_{convite_id}.png")
+
+    qr.save(arquivo)
+
+    return arquivo
 # ==========================
 # PÁGINA PRINCIPAL
 # ==========================
@@ -120,10 +136,11 @@ def index():
             "pagamento.html",
             protocolo=protocolo,
             status=status,
-            pix=CHAVE_PIX,
+            recebedor=NOME_RECEBEDOR,
             valor=VALOR_INSCRICAO,
+            pix=CHAVE_PIX,
             qr_code=f"/static/qrcodes/{protocolo}.png",
-            pix_copia_cola=CHAVE_PIX
+            pix_copia_cola=CHAVE_PIX,
         )
 
    
@@ -227,19 +244,127 @@ def pagar(protocolo):
         WHERE protocolo = ?
     """, (protocolo,))
 
+    # 👉 criar convite ID
+    convite_id = uuid.uuid4().hex[:10].upper()
+
+    cursor.execute("""
+        UPDATE inscritos
+        SET convite_id = ?
+        WHERE protocolo = ?
+    """, (convite_id, protocolo))
+
     conn.commit()
     conn.close()
 
-    return """
+    # 👉 gerar QR do convite
+    gerar_qr_convite(convite_id)
+
+    return f"""
     <html>
-    <body style='font-family:Arial;text-align:center;padding:40px'>
+    <body style='font-family:Arial;text-align:center;padding:40px;background:#111;color:#fff'>
+
         <h2>✅ Pagamento confirmado</h2>
 
-        <a href='/admin'>Voltar ao Admin</a>
+        <p>Seu ingresso VIP está pronto!</p>
+
+        <a href='/convite/{convite_id}'
+           style='padding:10px 20px;background:gold;color:#000;text-decoration:none;border-radius:8px'>
+           🎟️ VER CONVITE VIP
+        </a>
+
     </body>
     </html>
     """
+
     
+@app.route("/convite/<convite_id>")
+def convite(convite_id):
+
+    conn = sqlite3.connect("evento.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nome, protocolo
+        FROM inscritos
+        WHERE convite_id = ?
+    """, (convite_id,))
+
+    user = cursor.fetchone()
+    conn.close()
+
+    if not user:
+        return "Convite não encontrado"
+
+    nome, protocolo = user
+
+    return render_template(
+        "convite.html",
+        nome=nome,
+        convite_id=convite_id,
+        qr=f"/static/qrcodes/convite_{convite_id}.png"
+    )
+    
+@app.route("/pdf/<convite_id>")
+def gerar_pdf(convite_id):
+
+    conn = sqlite3.connect("evento.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nome, protocolo
+        FROM inscritos
+        WHERE convite_id = ?
+    """, (convite_id,))
+
+    user = cursor.fetchone()
+
+    conn.close()
+
+    if not user:
+        return "Convite não encontrado"
+
+    nome, protocolo = user
+
+    os.makedirs("pdfs", exist_ok=True)
+
+    arquivo_pdf = f"pdfs/{convite_id}.pdf"
+
+    doc = SimpleDocTemplate(arquivo_pdf)
+
+    styles = getSampleStyleSheet()
+
+    elementos = []
+
+    elementos.append(
+        Paragraph("CONVITE VIP", styles["Title"])
+    )
+
+    elementos.append(Spacer(1, 20))
+
+    elementos.append(
+        Paragraph(f"Nome: {nome}", styles["Normal"])
+    )
+
+    elementos.append(
+        Paragraph(f"Protocolo: {protocolo}", styles["Normal"])
+    )
+
+    elementos.append(
+        Paragraph(f"ID Convite: {convite_id}", styles["Normal"])
+    )
+
+    elementos.append(Spacer(1, 20))
+
+    elementos.append(
+        Paragraph("Entrada autorizada.", styles["Normal"])
+    )
+
+    doc.build(elementos)
+
+    return send_file(
+        arquivo_pdf,
+        as_attachment=True
+    )
 if __name__ == "__main__":
     app.run(
         debug=True,

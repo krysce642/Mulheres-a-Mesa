@@ -22,7 +22,7 @@ body{
 
 .btn-inscricao{
     margin-top:25px;
-    background:#d63384;
+    background:#932dbb;
     color:white;
     text-decoration:none;
     padding:15px 40px;
@@ -33,7 +33,7 @@ body{
 }
 
 .btn-inscricao:hover{
-    background:#bb2d73;
+    background:#932dbb
 }
 
 .card{
@@ -66,7 +66,7 @@ form textarea{
 }
 
 form button{
-    background:#d63384;
+    background:#932dbb;
     color:white;
     border:none;
     padding:15px;
@@ -76,7 +76,7 @@ form button{
 }
 
 form button:hover{
-    background:#bb2d73;
+    background:#932dbb;
 }
 .card{
     background:white;
@@ -149,4 +149,44 @@ body::before {
 @keyframes shine {
     0% { transform: translateX(-50%) rotate(25deg); }
     100% { transform: translateX(50%) rotate(25deg); }
+}
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:20px;
+    font-family:Arial, sans-serif;
+}
+
+.container{
+    width:100%;
+    display:flex;
+    justify-content:center;
+}
+
+.card{
+    width:100%;
+    max-width:500px;
+}
+
+img{
+    max-width:100%;
+    height:auto;
+}
+
+@media (max-width:768px){
+
+    h1{
+        font-size:28px;
+    }
+
+    h2{
+        font-size:22px;
+    }
+
+    .card{
+        padding:20px;
+    }
 }
